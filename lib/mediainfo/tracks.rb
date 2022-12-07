@@ -23,7 +23,7 @@ module MediaInfo
             track_elements = Attributes.new(track.children.select{ |n| n.is_a? ::Nokogiri::XML::Element }.map{ |parameter|
               parameter.name = standardize_element_name(parameter.name) # Turn various element names into standardized versions (Bit_rate to Bitrate)
               if parameter.text.include?("\n") # if it has children (extra in iphone6+_video.mov.xml)
-                [parameter.name, parameter.children.select { |n| n.is_a? ::Nokogiri::XML::Element }.map{ |parameter| [parameter.name, parameter.text]}]
+                [parameter.name, parameter.children.select { |n| n.is_a? ::Nokogiri::XML::Element }.map{ |parameter| [standardize_element_name(parameter.name), parameter.text]}]
               else
                 [parameter.name, parameter.text]
               end
@@ -68,7 +68,7 @@ module MediaInfo
     # Standardize our Element Names
     ## Relies on valid YAML in lib/attribute_standardization_rules.yml
     def standardize_element_name(name)
-      self.attribute_standardization_rules[name].nil? ? name : self.attribute_standardization_rules[name]
+      self.attribute_standardization_rules[name].nil? ? name.gsub('-', '_') : self.attribute_standardization_rules[name]
     end
 
     class Attributes
